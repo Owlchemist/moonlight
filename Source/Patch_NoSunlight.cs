@@ -10,12 +10,12 @@ namespace Moonlight
 	{
         static SkyTarget? Postfix(SkyTarget? __result)
 		{
-            int day = 8; //Fetch a default
-            if (Find.CurrentMap != null) day = GenLocalDate.DayOfSeason(Find.CurrentMap);
+            int day = (Find.CurrentMap != null) ? GenLocalDate.DayOfSeason(Find.CurrentMap) : 8;
+            
             if (__result.HasValue)
             {
                 SkyTarget newSky = __result.Value;
-                newSky.colors.sky *= WeatherWorker_Moonlight.brightnessMid[day];
+                newSky.colors.sky *= MoonlightMod.brightnessMid[day];
                 return newSky;
             }
             return new SkyTarget();

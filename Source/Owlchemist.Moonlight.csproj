@@ -44,7 +44,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Moonlight.cs" />
+    <Compile Include="Mod_Moonlight.cs" />
+    <Compile Include="ModSettings_Moonlight.cs" />
     <Compile Include="WeatherWorker_Moonlight.cs" />
     <Compile Include="MapComponent_ChangeMoonCycle.cs" />
     <Compile Include="Patch_NoSunlight.cs" />
