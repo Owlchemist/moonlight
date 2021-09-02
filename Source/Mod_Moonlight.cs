@@ -70,7 +70,7 @@ namespace Moonlight
 				settings.darkest + diff};
 
 			//Recalculate edge darkness
-			float halfDarkest = diff * 2;
+			float halfDarkest = settings.brightest - (diff / 2);
 			diff = settings.brightest - halfDarkest;
 			if (diff != 0f) diff /= 6;
 
