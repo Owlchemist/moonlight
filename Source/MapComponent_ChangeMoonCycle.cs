@@ -1,6 +1,4 @@
 using Verse;
-using RimWorld;
-using System.Linq;
 
 namespace Moonlight
 {
@@ -13,15 +11,15 @@ namespace Moonlight
         }
 
         //Rebuild the weatherdef's workers every day at noon. This may have some weird consequences for games where multiple colonies are sepreated by over 6 hours of timezone? Something to look into improving as time allows...
-        public override void MapComponentUpdate()
+        public override void MapComponentTick()
         {
-            if(!updatedThisDay && GenLocalDate.HourOfDay(map) == 12)
+            if(!updatedThisDay && Find.TickManager.TicksGame % 60000 == 15000)
             {
                 updatedThisDay = true;
                 MoonlightMod.UpdateMoonlight();
             }
 
-            else if(updatedThisDay && GenLocalDate.HourOfDay(map) != 12)
+            else if(updatedThisDay && Find.TickManager.TicksGame % 60000 != 15000)
             {
                 updatedThisDay = false;
             }
