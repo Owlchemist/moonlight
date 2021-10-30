@@ -1,5 +1,0 @@
-C:\Games\Steam\steamapps\common\RimWorld\Development\moonlight\Source\obj\Release\Owlchemist.Moonlight.csproj.AssemblyReference.cache
-C:\Games\Steam\steamapps\common\RimWorld\Development\moonlight\Source\obj\Release\Owlchemist.Moonlight.csproj.CoreCompileInputs.cache
-C:\Games\Steam\steamapps\common\RimWorld\Development\moonlight\Assemblies\Moonlight.dll
-C:\Games\Steam\steamapps\common\RimWorld\Development\moonlight\Source\obj\Release\Moonlight.dll
-C:\Games\Steam\steamapps\common\RimWorld\Mods\Moonlight\Assemblies\Moonlight.dll
