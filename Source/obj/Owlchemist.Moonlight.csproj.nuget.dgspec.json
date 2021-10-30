@@ -1,0 +1,46 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Games\\Steam\\steamapps\\common\\RimWorld\\Development\\moonlight\\Source\\Owlchemist.Moonlight.csproj": {}
+  },
+  "projects": {
+    "C:\\Games\\Steam\\steamapps\\common\\RimWorld\\Development\\moonlight\\Source\\Owlchemist.Moonlight.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Games\\Steam\\steamapps\\common\\RimWorld\\Development\\moonlight\\Source\\Owlchemist.Moonlight.csproj",
+        "projectName": "Moonlight",
+        "projectPath": "C:\\Games\\Steam\\steamapps\\common\\RimWorld\\Development\\moonlight\\Source\\Owlchemist.Moonlight.csproj",
+        "packagesPath": "C:\\Users\\Owner\\.nuget\\packages\\",
+        "outputPath": "C:\\Games\\Steam\\steamapps\\common\\RimWorld\\Development\\moonlight\\Source\\obj\\",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "configFilePaths": [
+          "C:\\Users\\Owner\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "net472": {
+          "dependencies": {
+            "Krafs.Publicizer": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[1.0.1, )"
+            }
+          }
+        }
+      }
+    }
+  }
+}

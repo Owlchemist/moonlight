@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "COKGnb0b8b8TzZx+N7BKEbC0Eqm00pvKfKbvCcLtk4oZw8EQt0RVwFER/fxuf4xZaKCM1pQ6qwwt0+sEej8G0w==",
+  "success": true,
+  "projectFilePath": "C:\\Games\\Steam\\steamapps\\common\\RimWorld\\Development\\moonlight\\Source\\Owlchemist.Moonlight.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Owner\\.nuget\\packages\\krafs.publicizer\\1.0.1\\krafs.publicizer.1.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
