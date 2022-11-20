@@ -27,6 +27,7 @@ namespace Moonlight
 			ticks = 0;
             
 			//Prepare list of coordinates to analyze
+			if (Find.Maps.Count < 1) return 0;
 			float[] maps = Find.Maps.Select(map => Find.WorldGrid.LongLatOf(map.Tile).x).ToArray();
 			float longitude;
 

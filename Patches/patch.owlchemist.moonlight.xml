@@ -1,6 +1,7 @@
 ﻿<Patch>
-	<Operation MayRequire="kentington.saveourship2" Class="PatchOperationAddModExtension">
-		<xpath>Defs/WeatherDef[defName="OuterSpaceWeather"]</xpath>
+	<Operation Class="PatchOperationAddModExtension">
+		<success>Always</success>
+		<xpath>Defs/WeatherDef[defName="OuterSpaceWeather" or defName="AB_ForsakenNight"]</xpath>
 		<value>
 			<li Class="Moonlight.Weather" />
 		</value>
