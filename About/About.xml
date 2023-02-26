@@ -13,7 +13,6 @@
 	<incompatibleWith>
 		<li>wemd.realisticdarkness</li>
 		<li>wemd.realisticdarknesslight</li>
-		<li>biomesteam.biomescore</li>
 	</incompatibleWith>
 	<modDependencies>
 		<li>
