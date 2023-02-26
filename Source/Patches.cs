@@ -10,28 +10,36 @@ namespace Moonlight
     [HarmonyPatch(typeof(GameCondition_NoSunlight), nameof(GameCondition_NoSunlight.SkyTarget))]
 	public class Patch_NoSunlight
 	{
-        static void Postfix(ref SkyTarget? __result)
+        static SkyTarget? Postfix(SkyTarget? __result)
 		{  
-            if (__result.HasValue) __result.value.colors.sky *= brightnessMid[day];
+            if (__result.HasValue)
+            {
+                __result.value.colors.sky *= brightnessMid[day];
+                return __result;
+            }
+            else return null;
         }
     }
 
-    [HarmonyPatch(typeof(World), nameof(World.WorldTick))]
-	public class Patch_WorldTick
+    [HarmonyPatch(typeof(TickManager), nameof(TickManager.DoSingleTick))]
+	public class Patch_DoSingleTick
 	{
         static void Postfix()
         {
-            //Noon?
-            if(++ticks == 2500 && FindMiddle() == 12) UpdateMoonlight();
+            if(ticks-- == 0)
+            {
+			    ticks = 2500;
+                if (FindMiddle() == 12) UpdateMoonlight(); //Noon?
+            }
         }
     }
 
-    [HarmonyPatch(typeof(Game), nameof(Game.LoadGame))]
-	public class Patch_LoadGame
+    [HarmonyPatch(typeof(World), nameof(World.FinalizeInit))]
+	public class Patch_FinalizeInit
 	{
         static void Postfix()
         {
-            Setup();
+            RefreshCache();
         }
     }
 }
