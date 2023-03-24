@@ -2,6 +2,7 @@ using Verse;
 using RimWorld;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using static Moonlight.ModSettings_Moonlight;
 
 namespace Moonlight
@@ -9,48 +10,68 @@ namespace Moonlight
 	[StaticConstructorOnStartup]
 	static class MoonlightUtility
 	{
-        public static int ticks, day = 8;
+        public static int day = 8;
         static float[] brightnessEdge = new float[] { 0.7f, 0.7425f, 0.785f, 0.8275f, 0.87f, 0.9125f, 0.955f, 1, 1, 0.955f, 0.9125f, 0.87f, 0.8275f, 0.785f, 0.7425f };
 		public static float[] brightnessMid = new float[] { 0.35f, 0.45f, 0.55f, 0.65f, 0.75f, 0.85f, 0.95f, 1, 1, 0.95f, 0.85f, 0.75f, 0.65f, 0.55f, 0.45f };
 		static WeatherDef[] weatherDefs;
+		static int updateCooldown = 0;
 
 		static MoonlightUtility()
 		{
-			weatherDefs = DefDatabase<WeatherDef>.AllDefs.Where(x => !x.HasModExtension<Weather>()).ToArray();
+			var list = DefDatabase<WeatherDef>.AllDefsListForReading;
+			var workingList = new List<WeatherDef>();
+			for (int i = list.Count; i-- > 0;)
+			{
+				var def = list[i];
+				if (!def.HasModExtension<Weather>()) workingList.Add(def);
+			}
+			weatherDefs = workingList.ToArray();
 			RefreshCache();
 		}
 
 		public static void RefreshCache()
 		{
-			if (Current.ProgramState == ProgramState.Playing) LongEventHandler.QueueLongEvent(() => FindMiddle(), null, false, null);
+			updateCooldown = 0;
+			if (Current.ProgramState != ProgramState.Entry) LongEventHandler.QueueLongEvent(() => FindMiddle(true), null, false, null);
 			LongEventHandler.QueueLongEvent(() => RecalculateArray(), null, false, null);
 		}
 
-		//Sets the frame of reference (for the timezone) based on the middlemost world position when the player has multiple colonies
-        public static int FindMiddle()
+		//Sets the frame of reference (for the timezone) based on the middlemost world position when the player has multiple colonies. It also sets the static field "day"
+        public static int FindMiddle(bool forceUpdate = false)
         {
+			if (!forceUpdate && --updateCooldown > 0) return 0;
+
 			//Prepare list of coordinates to analyze
-			if (Find.Maps.Count < 1) return 0;
-			float[] maps = Find.Maps.Select(map => Find.WorldGrid.LongLatOf(map.Tile).x).ToArray();
+			var maps = Find.Maps;
+			var length = maps.Count;
+			if (length < 1) return 0;
+
+			var worldGrid = Find.WorldGrid;
+			var mapslongitudes = new List<float>();
+			for (int i = length; i-- > 0;)
+			{
+				mapslongitudes.Add(worldGrid.LongLatOf(maps[i].Tile).x);
+			}
+			
 			float longitude;
 
 			//If we only have 1 map, the answer is simple and we can skip all the complicated math
-			if (maps.Length == 1) longitude = maps[0];
+			if (mapslongitudes.Count == 1) longitude = mapslongitudes[0];
 			else
 			{
 				//Find averages for solution A (primemerdian) and B (antimerdian)
-				float[] longitudes = new float[2] {maps.Average(), 0};
+				float[] longitudes = new float[2] {mapslongitudes.Average(), 0};
 
 				//Solution B
-				foreach (var mapCoord in maps)
+				foreach (var mapCoord in mapslongitudes)
 				{
 					longitudes[1] += (mapCoord < 0) ? mapCoord + 360 : mapCoord;
 				}
-				longitudes[1] /= maps.Length;
+				longitudes[1] /= mapslongitudes.Count;
 
 				//Analyze results
 				float[] distances = new float[2];
-				foreach (var mapCoord in maps)
+				foreach (var mapCoord in mapslongitudes)
 				{
 					distances[0] += Math.Abs(longitudes[0] - mapCoord);
 					distances[1] += Math.Abs(longitudes[1] - (mapCoord < 0 ? mapCoord + 360 : mapCoord));
@@ -63,13 +84,13 @@ namespace Moonlight
 				longitude = distances[0] < distances[1] ? longitudes[0] : longitudes[1];
 			}
 
-			long time = Find.TickManager.gameStartAbsTick + Find.TickManager.TicksGame + GenDate.LocalTicksOffsetFromLongitude(longitude);
-			day = GenDate.DayOfSeason(time, longitude);
+			day = GenDate.DayOfSeason(Current.gameInt.tickManager.TicksAbs, longitude);
+			long time = Current.gameInt.tickManager.TicksAbs + GenDate.LocalTicksOffsetFromLongitude(longitude);
 
 			//Debug
 			if (logging && Prefs.DevMode)
 			{
-				Log.Message("[Moonlight] local time: " + GenMath.PositiveModRemap(time, 2500, 24) + " and day: " + day.ToString());
+				Log.Message("[Moonlight] Local time: " + GenMath.PositiveModRemap(time, 2500, 24) + " and day: " + day);
 			}
 
 			//Return
@@ -126,11 +147,12 @@ namespace Moonlight
 
 			UpdateMoonlight();
 		}
-		public static void UpdateMoonlight()
+		public static void UpdateMoonlight(bool resetCooldown = false)
 		{
+			if (resetCooldown) updateCooldown = 60;
 			//Debug before...
-			string originalValue = "";
-			if (logging && Prefs.DevMode && Current.ProgramState == ProgramState.Playing) originalValue = DefDatabase<WeatherDef>.GetNamed("Clear").workerInt.skyTargets[0].colors.sky.ToString();
+			UnityEngine.Color originalValue = default;
+			if (logging && Prefs.DevMode && Current.ProgramState == ProgramState.Playing) originalValue = DefDatabase<WeatherDef>.GetNamed("Clear").workerInt.skyTargets[0].colors.sky;
 
 			if (weatherDefs == null)
 			{
@@ -145,9 +167,9 @@ namespace Moonlight
 			}
 
 			//Debug after...
-			if (logging && !originalValue.NullOrEmpty())
+			if (logging && originalValue != default)
 			{
-				Log.Message("[Moonlight] Base sky changed from " + originalValue + " to " + (DefDatabase<WeatherDef>.GetNamed("Clear").workerInt.skyTargets[0].colors.sky).ToString() + " for day " + day);
+				Log.Message("[Moonlight] Base sky changed from " + originalValue + " to " + DefDatabase<WeatherDef>.GetNamed("Clear").workerInt.skyTargets[0].colors.sky + " for day " + day);
 			}
 		}
     }

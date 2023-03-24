@@ -1,6 +1,5 @@
 using HarmonyLib;
 using RimWorld;
-using RimWorld.Planet;
 using Verse;
 using static Moonlight.MoonlightUtility;
 
@@ -21,21 +20,18 @@ namespace Moonlight
         }
     }
 
-    [HarmonyPatch(typeof(TickManager), nameof(TickManager.DoSingleTick))]
-	public class Patch_DoSingleTick
+    //We're patching here because it's a point of entry with the minimal overhead, unlikely to be bypassed by other mods, and only periodically ticked every 1000th tick.
+    [HarmonyPatch(typeof(GoodwillSituationManager), nameof(GoodwillSituationManager.RecalculateAll))]
+	public class Patch_GoodwillSituationManager_RecalculateAll
 	{
         static void Postfix()
         {
-            if(ticks-- == 0)
-            {
-			    ticks = 2500;
-                if (FindMiddle() == 12) UpdateMoonlight(); //Noon?
-            }
+            if (FindMiddle() == 12) UpdateMoonlight(true);
         }
     }
 
-    [HarmonyPatch(typeof(World), nameof(World.FinalizeInit))]
-	public class Patch_FinalizeInit
+    [HarmonyPatch(typeof(Map), nameof(Map.FinalizeInit))]
+	public class Patch_Map_FinalizeInit
 	{
         static void Postfix()
         {
